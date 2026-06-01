@@ -1,0 +1,13 @@
+[versions]
+agp = "9.2.0"
+compileSdk = "37"
+java = "21"
+minSdk = "29"
+targetSdk = "37"
+xposedApi = "82"
+
+[libraries]
+xposed-api = { module = "de.robv.android.xposed:api", version.ref = "xposedApi" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }

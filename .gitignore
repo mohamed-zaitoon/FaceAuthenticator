@@ -1,0 +1,20 @@
+# Gradle
+.gradle/
+build/
+**/build/
+
+# Local Android/IDE files
+local.properties
+.idea/
+.vscode/
+
+# Generated outputs
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.iml

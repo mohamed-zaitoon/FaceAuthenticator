@@ -1,1 +1,1 @@
-# FaceAuthenticatorHyperos
+# FaceAuthenticator
