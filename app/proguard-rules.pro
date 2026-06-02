@@ -1,0 +1,3 @@
+-keep class com.mohamedzaitoon.faceauthenticator.FaceHook { *; }
+-keep class * implements de.robv.android.xposed.IXposedHookLoadPackage { *; }
+-dontwarn de.robv.android.xposed.**

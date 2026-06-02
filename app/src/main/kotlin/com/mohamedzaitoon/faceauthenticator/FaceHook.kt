@@ -187,12 +187,16 @@ class FaceHook : IXposedHookLoadPackage {
                     object : XC_MethodHook() {
                         override fun beforeHookedMethod(param: MethodHookParam) {
                             val preAuthInfo = findPreAuthInfoArgument(param.args) ?: return
+                            val packageName = findLikelyPackageName(param.args)
 
-                            val result = preferFaceThenFingerprint(preAuthInfo)
+                            val result = if (requiresFingerprintOnly(packageName)) {
+                                preferFingerprintOnly(preAuthInfo)
+                            } else {
+                                preferFaceThenFingerprint(preAuthInfo)
+                            }
                             if (result.changed) {
                                 XposedBridge.log(
-                                    TAG + "Biometric prompt from " +
-                                        findLikelyPackageName(param.args) +
+                                    TAG + "Biometric prompt from " + packageName +
                                         ": ordered " + result.selectedModality +
                                         ", eligibleSensors " + result.originalCount +
                                         " -> " + result.finalCount
@@ -431,6 +435,8 @@ class FaceHook : IXposedHookLoadPackage {
         private const val MODALITY_FACE = 8
         private const val BIOMETRIC_STRONG = 15
         private const val DISABLE_FILE = "/data/local/tmp/disable_faceauth"
+        private const val QNB_PACKAGE_NAME = "com.qnbalahli.bebasata"
+        private const val THNDR_PACKAGE_NAME = "com.axismarkets.thndr"
 
         private const val ENABLE_SYSTEM_FACE_REGISTRATION_UPGRADE = true
         private const val ENABLE_SYSTEM_CONFIG_AND_PROVIDER_UPGRADE = false
@@ -557,6 +563,60 @@ class FaceHook : IXposedHookLoadPackage {
             return SensorPriorityResult(
                 true,
                 "face first, fingerprint fallback",
+                originalCount,
+                selectedSensors.size
+            )
+        }
+
+        private fun requiresFingerprintOnly(packageName: String): Boolean {
+            return packageName == QNB_PACKAGE_NAME || packageName == THNDR_PACKAGE_NAME
+        }
+
+        private fun preferFingerprintOnly(preAuthInfo: Any?): SensorPriorityResult {
+            if (preAuthInfo == null) {
+                return SensorPriorityResult.UNCHANGED
+            }
+
+            val eligibleObject = try {
+                XposedHelpers.getObjectField(preAuthInfo, "eligibleSensors")
+            } catch (t: Throwable) {
+                XposedBridge.log(TAG + "Unable to read PreAuthInfo.eligibleSensors: " + t.message)
+                return SensorPriorityResult.UNCHANGED
+            }
+
+            if (eligibleObject !is List<*>) {
+                return SensorPriorityResult.UNCHANGED
+            }
+
+            val eligibleSensors = eligibleObject
+            if (eligibleSensors.isEmpty()) {
+                return SensorPriorityResult.UNCHANGED
+            }
+
+            val selectedSensors = ArrayList<Any?>()
+            var removedFace = false
+            for (sensor in eligibleSensors) {
+                if (isFingerprintBiometricSensor(sensor)) {
+                    selectedSensors.add(sensor)
+                } else if (isFaceBiometricSensor(sensor)) {
+                    removedFace = true
+                } else {
+                    selectedSensors.add(sensor)
+                }
+            }
+
+            if (!removedFace || selectedSensors.isEmpty()) {
+                return SensorPriorityResult.UNCHANGED
+            }
+
+            val originalCount = eligibleSensors.size
+            if (!replaceEligibleSensors(preAuthInfo, eligibleSensors, selectedSensors)) {
+                return SensorPriorityResult.UNCHANGED
+            }
+
+            return SensorPriorityResult(
+                true,
+                "fingerprint only for keystore-bound app",
                 originalCount,
                 selectedSensors.size
             )

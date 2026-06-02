@@ -2,6 +2,16 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
+def keystoreProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withInputStream { keystoreProperties.load(it) }
+}
+def releaseStoreFile = keystoreProperties['release.storeFile'] ?: System.getenv('RELEASE_STORE_FILE')
+def releaseStorePassword = keystoreProperties['release.storePassword'] ?: System.getenv('RELEASE_STORE_PASSWORD')
+def releaseKeyAlias = keystoreProperties['release.keyAlias'] ?: System.getenv('RELEASE_KEY_ALIAS')
+def releaseKeyPassword = keystoreProperties['release.keyPassword'] ?: System.getenv('RELEASE_KEY_PASSWORD')
+
 android {
     namespace = 'com.mohamedzaitoon.faceauthenticator'
     compileSdk = libs.versions.compileSdk.get().toInteger()
@@ -10,15 +20,29 @@ android {
         applicationId = "com.mohamedzaitoon.faceauthenticator"
         minSdk = libs.versions.minSdk.get().toInteger()
         targetSdk = libs.versions.targetSdk.get().toInteger()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 10
+        versionName = "v1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        release {
+            if (releaseStoreFile) {
+                storeFile = file(releaseStoreFile)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled = false
+            minifyEnabled = true
+            if (releaseStoreFile) {
+                signingConfig = signingConfigs.release
+            }
             proguardFiles(
                     getDefaultProguardFile('proguard-android-optimize.txt'),
                     'proguard-rules.pro'
