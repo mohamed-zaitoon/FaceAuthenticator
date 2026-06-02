@@ -3,14 +3,25 @@ plugins {
 }
 
 def keystoreProperties = new Properties()
+def keyPropertiesFile = rootProject.file('key.properties')
 def localPropertiesFile = rootProject.file('local.properties')
-if (localPropertiesFile.exists()) {
+if (keyPropertiesFile.exists()) {
+    keyPropertiesFile.withInputStream { keystoreProperties.load(it) }
+} else if (localPropertiesFile.exists()) {
     localPropertiesFile.withInputStream { keystoreProperties.load(it) }
 }
-def releaseStoreFile = keystoreProperties['release.storeFile'] ?: System.getenv('RELEASE_STORE_FILE')
-def releaseStorePassword = keystoreProperties['release.storePassword'] ?: System.getenv('RELEASE_STORE_PASSWORD')
-def releaseKeyAlias = keystoreProperties['release.keyAlias'] ?: System.getenv('RELEASE_KEY_ALIAS')
-def releaseKeyPassword = keystoreProperties['release.keyPassword'] ?: System.getenv('RELEASE_KEY_PASSWORD')
+def releaseStoreFile = keystoreProperties['store_file'] ?:
+        keystoreProperties['release.storeFile'] ?:
+        System.getenv('RELEASE_STORE_FILE')
+def releaseStorePassword = keystoreProperties['store_password'] ?:
+        keystoreProperties['release.storePassword'] ?:
+        System.getenv('RELEASE_STORE_PASSWORD')
+def releaseKeyAlias = keystoreProperties['key_alias'] ?:
+        keystoreProperties['release.keyAlias'] ?:
+        System.getenv('RELEASE_KEY_ALIAS')
+def releaseKeyPassword = keystoreProperties['key_password'] ?:
+        keystoreProperties['release.keyPassword'] ?:
+        System.getenv('RELEASE_KEY_PASSWORD')
 
 android {
     namespace = 'com.mohamedzaitoon.faceauthenticator'
@@ -33,6 +44,10 @@ android {
                 storePassword = releaseStorePassword
                 keyAlias = releaseKeyAlias
                 keyPassword = releaseKeyPassword
+                enableV1Signing = true
+                enableV2Signing = true
+                enableV3Signing = true
+                enableV4Signing = true
             }
         }
     }

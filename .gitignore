@@ -14,10 +14,6 @@ local.properties
 *.ap_
 *.dex
 
-# Signing material
-*.jks
-*.keystore
-
 # OS/editor noise
 .DS_Store
 Thumbs.db
