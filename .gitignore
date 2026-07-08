@@ -1,0 +1,30 @@
+# Gradle
+.gradle/
+build/
+**/build/
+
+# Local Android/IDE files
+local.properties
+key.properties
+*.jks
+app/google-services.json
+.idea/
+.vscode/
+
+# Private update/Firebase/GitHub integration
+app/src/main/kotlin/com/mohamedzaitoon/faceauthenticator/UpdateChecker.kt
+app/src/main/kotlin/com/mohamedzaitoon/faceauthenticator/UpdateCheckerActivity.kt
+app/src/main/res/drawable/ic_github.xml
+app/src/main/res/xml/file_paths.xml
+
+# Generated outputs
+dist/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.iml

@@ -1,0 +1,85 @@
+plugins {
+    alias(libs.plugins.android.application)
+}
+
+def keystoreProperties = new Properties()
+def keyPropertiesFile = rootProject.file('key.properties')
+def localPropertiesFile = rootProject.file('local.properties')
+if (keyPropertiesFile.exists()) {
+    keyPropertiesFile.withInputStream { keystoreProperties.load(it) }
+} else if (localPropertiesFile.exists()) {
+    localPropertiesFile.withInputStream { keystoreProperties.load(it) }
+}
+def releaseStoreFile = keystoreProperties['store_file'] ?:
+        keystoreProperties['release.storeFile'] ?:
+        System.getenv('RELEASE_STORE_FILE')
+def releaseStorePassword = keystoreProperties['store_password'] ?:
+        keystoreProperties['release.storePassword'] ?:
+        System.getenv('RELEASE_STORE_PASSWORD')
+def releaseKeyAlias = keystoreProperties['key_alias'] ?:
+        keystoreProperties['release.keyAlias'] ?:
+        System.getenv('RELEASE_KEY_ALIAS')
+def releaseKeyPassword = keystoreProperties['key_password'] ?:
+        keystoreProperties['release.keyPassword'] ?:
+        System.getenv('RELEASE_KEY_PASSWORD')
+
+android {
+    namespace = 'com.mohamedzaitoon.faceauthenticator'
+    compileSdk = libs.versions.compileSdk.get().toInteger()
+
+    sourceSets {
+        main {
+            kotlin {
+                exclude '**/UpdateChecker.kt'
+                exclude '**/UpdateCheckerActivity.kt'
+            }
+        }
+    }
+
+    defaultConfig {
+        applicationId = "com.mohamedzaitoon.faceauthenticator"
+        minSdk = libs.versions.minSdk.get().toInteger()
+        targetSdk = libs.versions.targetSdk.get().toInteger()
+        versionCode = libs.versions.versionCode.get().toInteger()
+        versionName = libs.versions.versionName.get()
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        release {
+            if (releaseStoreFile) {
+                storeFile = file(releaseStoreFile)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+                enableV1Signing = true
+                enableV2Signing = true
+                enableV3Signing = true
+                enableV4Signing = true
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled = true
+            if (releaseStoreFile) {
+                signingConfig = signingConfigs.release
+            }
+            proguardFiles(
+                    getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
+            )
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.toVersion(libs.versions.java.get())
+        targetCompatibility = JavaVersion.toVersion(libs.versions.java.get())
+    }
+}
+
+dependencies {
+    compileOnly libs.xposed.api
+}
