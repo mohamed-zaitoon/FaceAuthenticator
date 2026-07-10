@@ -13,7 +13,7 @@
 
 The module runs only in the Android system framework scope. It does not add a launcher UI and it does not create a fake biometric provider.
 
-[Download Latest APK](https://github.com/mohamed-zaitoon/FaceAuthenticator/releases) | [Website](https://mohamed-zaitoon.github.io/FaceAuthenticator/) | [Report Issues](https://github.com/mohamed-zaitoon/FaceAuthenticator/issues)
+[Download Latest APK](https://github.com/mohamed-zaitoon/FaceAuthenticator/releases) | [Website](https://faceauthenticator.mohamedzaitoon.com/) | [Report Issues](https://github.com/mohamed-zaitoon/FaceAuthenticator/issues)
 
 ---
 
