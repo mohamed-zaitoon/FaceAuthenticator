@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
 }
 
 def keystoreProperties = new Properties()
@@ -29,6 +30,10 @@ android {
 
     sourceSets {
         main {
+            java {
+                exclude '**/UpdateChecker.kt'
+                exclude '**/UpdateCheckerActivity.kt'
+            }
             kotlin {
                 exclude '**/UpdateChecker.kt'
                 exclude '**/UpdateCheckerActivity.kt'
