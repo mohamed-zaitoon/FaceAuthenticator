@@ -10,6 +10,7 @@ key.properties
 app/google-services.json
 .idea/
 .vscode/
+firebase-debug.log
 
 # Generated outputs
 dist/

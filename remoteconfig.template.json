@@ -1,0 +1,40 @@
+{
+  "parameters": {
+    "latest_version_name": {
+      "defaultValue": {
+        "value": "v1.3-beta03"
+      },
+      "valueType": "STRING"
+    },
+    "latest_version_code": {
+      "defaultValue": {
+        "value": "124"
+      },
+      "valueType": "NUMBER"
+    },
+    "update_url": {
+      "defaultValue": {
+        "value": "AUTO"
+      },
+      "valueType": "STRING"
+    },
+    "release_notes": {
+      "defaultValue": {
+        "value": "Firebase Remote Config verification and GitHub fallback improvements."
+      },
+      "valueType": "STRING"
+    },
+    "github_url": {
+      "defaultValue": {
+        "value": "https://github.com/mohamed-zaitoon/FaceAuthenticator"
+      },
+      "valueType": "STRING"
+    },
+    "website_url": {
+      "defaultValue": {
+        "value": "https://github.com/mohamed-zaitoon/FaceAuthenticator/releases/latest"
+      },
+      "valueType": "STRING"
+    }
+  }
+}

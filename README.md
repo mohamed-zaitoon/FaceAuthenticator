@@ -2,7 +2,7 @@
 
 ### Strong Face Unlock for BiometricPrompt Apps
 
-[![Version](https://img.shields.io/badge/Version-v1.3--beta02-2ea44f?style=for-the-badge&logo=github)](https://github.com/mohamed-zaitoon/FaceAuthenticator/releases)
+[![Version](https://img.shields.io/badge/Version-v1.3--beta03-2ea44f?style=for-the-badge&logo=github)](https://github.com/mohamed-zaitoon/FaceAuthenticator/releases)
 [![Android](https://img.shields.io/badge/Android-10%2B%20(API%2029%2B)-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://www.android.com/)
 [![Target](https://img.shields.io/badge/Target-Android%2017%20(API%2037)-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://www.android.com/)
 [![Xposed](https://img.shields.io/badge/Xposed-LSPosed%20Module-orange?style=for-the-badge)](https://github.com/LSPosed/LSPosed)

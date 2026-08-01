@@ -6,6 +6,8 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import org.json.JSONArray
 import org.json.JSONObject
 import java.net.HttpURLConnection
@@ -21,6 +23,12 @@ object UpdateChecker {
     private const val GITHUB_REPO = "FaceAuthenticator"
     private const val GITHUB_API_URL =
         "https://api.github.com/repos/$GITHUB_USER/$GITHUB_REPO/releases?per_page=20"
+    private const val KEY_LATEST_VERSION_CODE = "latest_version_code"
+    private const val KEY_LATEST_VERSION_NAME = "latest_version_name"
+    private const val KEY_UPDATE_URL = "update_url"
+    private const val KEY_RELEASE_NOTES = "release_notes"
+    private const val KEY_GITHUB_URL = "github_url"
+    private const val KEY_WEBSITE_URL = "website_url"
 
     data class ConfigResult(
         val githubUrl: String,
@@ -45,7 +53,101 @@ object UpdateChecker {
     )
 
     fun checkForUpdate(context: Context, listener: UpdateListener) {
-        fetchGitHubFallback(context, listener, null)
+        try {
+            val remoteConfig = FirebaseRemoteConfig.getInstance()
+            remoteConfig.setConfigSettingsAsync(
+                FirebaseRemoteConfigSettings.Builder()
+                    .setMinimumFetchIntervalInSeconds(0)
+                    .build()
+            )
+            remoteConfig.setDefaultsAsync(
+                mapOf(
+                    KEY_LATEST_VERSION_CODE to 0L,
+                    KEY_LATEST_VERSION_NAME to "",
+                    KEY_UPDATE_URL to "AUTO",
+                    KEY_RELEASE_NOTES to "",
+                    KEY_GITHUB_URL to DEFAULT_GITHUB_URL,
+                    KEY_WEBSITE_URL to DEFAULT_RELEASES_URL
+                )
+            ).continueWithTask { remoteConfig.fetchAndActivate() }
+                .addOnCompleteListener { task ->
+                    if (!task.isSuccessful) {
+                        Log.w(TAG, "Remote Config fetch failed; using activated values", task.exception)
+                    }
+                    processRemoteConfig(context, remoteConfig, listener)
+                }
+        } catch (e: Exception) {
+            Log.e(TAG, "Remote Config initialization failed: ${e.message}", e)
+            fetchGitHubFallback(context, listener, e.message)
+        }
+    }
+
+    private fun processRemoteConfig(
+        context: Context,
+        remoteConfig: FirebaseRemoteConfig,
+        listener: UpdateListener
+    ) {
+        try {
+            val latestCode = remoteConfig.getLong(KEY_LATEST_VERSION_CODE)
+            val latestName = remoteConfig.getString(KEY_LATEST_VERSION_NAME)
+            val updateUrl = remoteConfig.getString(KEY_UPDATE_URL)
+            val releaseNotes = remoteConfig.getString(KEY_RELEASE_NOTES)
+            val githubUrl = remoteConfig.getString(KEY_GITHUB_URL).ifBlank {
+                DEFAULT_GITHUB_URL
+            }
+            val websiteUrl = remoteConfig.getString(KEY_WEBSITE_URL).ifBlank {
+                DEFAULT_RELEASES_URL
+            }
+
+            Log.d(TAG, "Remote Config activated: versionCode=$latestCode, versionName=$latestName")
+            if (latestCode <= 0L) {
+                fetchGitHubFallback(context, listener, null, githubUrl, websiteUrl)
+                return
+            }
+
+            if (latestCode <= getAppVersionCode(context)) {
+                listener.onConfigFetched(
+                    ConfigResult(
+                        githubUrl = githubUrl,
+                        websiteUrl = websiteUrl,
+                        latestVersionName = latestName,
+                        releaseNotes = releaseNotes
+                    )
+                )
+                return
+            }
+
+            if (updateUrl.isBlank() || updateUrl.equals("AUTO", ignoreCase = true)) {
+                fetchDynamicUrlFromGitHub { release, _ ->
+                    listener.onConfigFetched(
+                        ConfigResult(
+                            githubUrl = githubUrl,
+                            websiteUrl = release?.htmlUrl?.ifBlank { websiteUrl } ?: websiteUrl,
+                            updateAvailable = true,
+                            latestVersionName = latestName.ifBlank {
+                                release?.versionName ?: "Version $latestCode"
+                            },
+                            downloadUrl = release?.downloadUrl?.ifBlank { websiteUrl } ?: websiteUrl,
+                            releaseNotes = releaseNotes.ifBlank { release?.notes.orEmpty() }
+                        )
+                    )
+                }
+            } else {
+                listener.onConfigFetched(
+                    ConfigResult(
+                        githubUrl = githubUrl,
+                        websiteUrl = websiteUrl,
+                        updateAvailable = true,
+                        latestVersionName = latestName.ifBlank { "Version $latestCode" },
+                        downloadUrl = updateUrl,
+                        releaseNotes = releaseNotes
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Remote Config processing failed: ${e.message}", e)
+            fetchGitHubFallback(context, listener, e.message)
+        }
     }
 
     private fun fetchGitHubFallback(
