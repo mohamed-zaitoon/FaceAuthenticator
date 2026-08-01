@@ -1,12 +1,11 @@
 [versions]
-agp = "9.2.1"
+agp = "9.3.1"
 compileSdk = "37"
 java = "21"
-kotlin = "2.4.0"
 minSdk = "29"
 targetSdk = "37"
-versionCode = "121"
-versionName = "v1.3-alpha01"
+versionCode = "122"
+versionName = "v1.3-beta"
 xposedApi = "82"
 
 [libraries]
@@ -14,4 +13,3 @@ xposed-api = { module = "de.robv.android.xposed:api", version.ref = "xposedApi" 
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

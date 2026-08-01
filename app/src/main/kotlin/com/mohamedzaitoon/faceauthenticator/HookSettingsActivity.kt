@@ -177,7 +177,7 @@ class HookSettingsActivity : Activity() {
         cardLayout.addView(delayInput)
 
         cardLayout.addView(TextView(this).apply {
-            text = "Default 1.5s. Minimum 0.001s, maximum 10s."
+            text = "Default 5s. Minimum 0.001s, maximum 10s."
             textSize = 12f
             setTextColor(Color.parseColor("#607D8B"))
             gravity = Gravity.CENTER
@@ -187,7 +187,7 @@ class HookSettingsActivity : Activity() {
         delayedFaceCheckBox = createHookCheckBox("Enable delayed face fallback", true)
         showMessagesCheckBox = createHookCheckBox("Show delay messages", false)
         instantConfirmationCheckBox = createHookCheckBox("Instant face confirmation", true)
-        keystoreCheckBox = createHookCheckBox("Keystore/Crypto apps use fingerprint only", true)
+        keystoreCheckBox = createHookCheckBox("Keystore/Crypto apps use fingerprint only", false)
         cardLayout.addView(delayedFaceCheckBox)
         cardLayout.addView(showMessagesCheckBox)
         cardLayout.addView(instantConfirmationCheckBox)
@@ -437,16 +437,16 @@ class HookSettingsActivity : Activity() {
         val delayedFaceEnabled: Boolean = true,
         val showStatusMessages: Boolean = false,
         val instantFaceConfirmation: Boolean = true,
-        val keystoreFingerprintOnly: Boolean = true
+        val keystoreFingerprintOnly: Boolean = false
     )
 
     private companion object {
         private const val ACTIVE_BOOT_KEY = "faceauthenticator_active_boot"
         private const val HOOK_SETTINGS_FILE = "/data/local/tmp/faceauth_settings.properties"
-        private const val DEFAULT_FACE_DELAY_MS = 1500L
+        private const val DEFAULT_FACE_DELAY_MS = 5000L
         private const val MIN_FACE_DELAY_MS = 1L
         private const val MAX_FACE_DELAY_MS = 10000L
-        private const val DEFAULT_FACE_DELAY_SECONDS = "1.5"
+        private const val DEFAULT_FACE_DELAY_SECONDS = "5"
         private const val MIN_FACE_DELAY_SECONDS = 0.001
         private const val MAX_FACE_DELAY_SECONDS = 10.0
     }

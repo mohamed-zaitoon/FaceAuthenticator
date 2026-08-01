@@ -606,7 +606,7 @@ class FaceHook : IXposedHookLoadPackage {
         private const val BIOMETRIC_STRONG = 15
         private const val FACE_ACQUIRED_GOOD = 0
         private const val FACE_ACQUIRED_TOO_DARK = 3
-        private const val DEFAULT_FINGERPRINT_FACE_DELAY_MS = 1500L
+        private const val DEFAULT_FINGERPRINT_FACE_DELAY_MS = 5000L
         private const val MIN_FINGERPRINT_FACE_DELAY_MS = 1L
         private const val MAX_FINGERPRINT_FACE_DELAY_MS = 10000L
         private const val FACE_LOW_LIGHT_BLOCK_MS = 120000L
@@ -641,7 +641,7 @@ class FaceHook : IXposedHookLoadPackage {
             val faceDelayMs: Long = DEFAULT_FINGERPRINT_FACE_DELAY_MS,
             val showStatusMessages: Boolean = false,
             val instantFaceConfirmation: Boolean = true,
-            val keystoreFingerprintOnly: Boolean = true
+            val keystoreFingerprintOnly: Boolean = false
         )
 
         private fun getHookSettings(): HookSettings {
@@ -694,7 +694,7 @@ class FaceHook : IXposedHookLoadPackage {
                     ),
                     keystoreFingerprintOnly = parseBooleanSetting(
                         values["keystore_fingerprint_only"],
-                        true
+                        false
                     )
                 )
             } catch (t: Throwable) {

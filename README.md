@@ -2,7 +2,7 @@
 
 ### Strong Face Unlock for BiometricPrompt Apps
 
-[![Version](https://img.shields.io/badge/Version-v1.3--alpha01-2ea44f?style=for-the-badge&logo=github)](https://github.com/mohamed-zaitoon/FaceAuthenticator/releases)
+[![Version](https://img.shields.io/badge/Version-v1.3--beta-2ea44f?style=for-the-badge&logo=github)](https://github.com/mohamed-zaitoon/FaceAuthenticator/releases)
 [![Android](https://img.shields.io/badge/Android-10%2B%20(API%2029%2B)-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://www.android.com/)
 [![Target](https://img.shields.io/badge/Target-Android%2017%20(API%2037)-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://www.android.com/)
 [![Xposed](https://img.shields.io/badge/Xposed-LSPosed%20Module-orange?style=for-the-badge)](https://github.com/LSPosed/LSPosed)
@@ -24,7 +24,7 @@ The module runs only in the Android system framework scope. It does not add a la
 | Real system hook | Hooks Android framework biometric classes instead of injecting app-specific UI code. |
 | Face strength upgrade | Marks real face sensors as `BIOMETRIC_STRONG` where the framework exposes a weaker value. |
 | Default routing | Leaves fingerprint-only and face-only prompts on the biometric type requested by the app. |
-| Delayed face priority | Starts fingerprint first when both fingerprint and face are eligible, then requests face after a configurable delay. Default: 1.5 seconds. |
+| Delayed face priority | Starts fingerprint first when both fingerprint and face are eligible, then requests face after a configurable delay. Default: 5 seconds. |
 | Hook settings | Lets rooted users configure delay from 0.001s to 10s, show or hide status messages, toggle delayed face, force instant face confirmation, and keep Keystore apps on fingerprint. |
 | Fingerprint-only overrides | Reads fingerprint-only package names from `/data/local/tmp/faceauth_fingerprint_only_packages` for apps that crash, show unexpected errors, or verify hardware/Keystore face behavior. |
 | App compatibility | Avoids app-process scope so protected apps such as QNB do not crash from LSPosed/root detection. |
@@ -63,10 +63,10 @@ The module settings screen writes root-readable settings to `/data/local/tmp/fac
 
 ```properties
 delayed_face_enabled=true
-face_delay_ms=1500
+face_delay_ms=5000
 show_status_messages=false
 instant_face_confirmation=true
-keystore_fingerprint_only=true
+keystore_fingerprint_only=false
 ```
 
 ## Example

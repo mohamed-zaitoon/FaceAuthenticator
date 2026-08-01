@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
 }
 
 def keystoreProperties = new Properties()
@@ -86,5 +85,5 @@ android {
 }
 
 dependencies {
-    compileOnly libs.xposed.api
+    compileOnly(libs.xposed.api)
 }
