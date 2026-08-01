@@ -1,14 +1,18 @@
 [versions]
 agp = "9.3.1"
+androidxCore = "1.19.0"
+androidxSwipeRefreshLayout = "1.2.0"
 compileSdk = "37"
 java = "21"
 minSdk = "29"
 targetSdk = "37"
-versionCode = "122"
-versionName = "v1.3-beta"
+versionCode = "123"
+versionName = "v1.3-beta02"
 xposedApi = "82"
 
 [libraries]
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
+androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "androidxSwipeRefreshLayout" }
 xposed-api = { module = "de.robv.android.xposed:api", version.ref = "xposedApi" }
 
 [plugins]

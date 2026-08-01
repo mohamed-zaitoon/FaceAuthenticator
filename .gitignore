@@ -11,12 +11,6 @@ app/google-services.json
 .idea/
 .vscode/
 
-# Private update/Firebase/GitHub integration
-app/src/main/kotlin/com/mohamedzaitoon/faceauthenticator/UpdateChecker.kt
-app/src/main/kotlin/com/mohamedzaitoon/faceauthenticator/UpdateCheckerActivity.kt
-app/src/main/res/drawable/ic_github.xml
-app/src/main/res/xml/file_paths.xml
-
 # Generated outputs
 dist/
 *.apk

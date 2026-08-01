@@ -27,19 +27,6 @@ android {
     namespace = 'com.mohamedzaitoon.faceauthenticator'
     compileSdk = libs.versions.compileSdk.get().toInteger()
 
-    sourceSets {
-        main {
-            java {
-                exclude '**/UpdateChecker.kt'
-                exclude '**/UpdateCheckerActivity.kt'
-            }
-            kotlin {
-                exclude '**/UpdateChecker.kt'
-                exclude '**/UpdateCheckerActivity.kt'
-            }
-        }
-    }
-
     defaultConfig {
         applicationId = "com.mohamedzaitoon.faceauthenticator"
         minSdk = libs.versions.minSdk.get().toInteger()
@@ -85,5 +72,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.swiperefreshlayout)
     compileOnly(libs.xposed.api)
 }
