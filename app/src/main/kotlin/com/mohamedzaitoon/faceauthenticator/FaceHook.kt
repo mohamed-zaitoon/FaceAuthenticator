@@ -1221,8 +1221,13 @@ class FaceHook : IXposedHookLoadPackage {
                 "com.android.systemui.biometrics.AuthBiometricFaceView",
                 "com.android.systemui.biometrics.AuthBiometricView",
                 "com.android.systemui.biometrics.AuthBiometricFingerprintAndFaceView",
+                "com.android.systemui.biometrics.AuthBiometricFaceToFingerprintView",
                 "com.android.systemui.biometrics.AuthContainerView",
-                "com.android.systemui.biometrics.AuthController"
+                "com.android.systemui.biometrics.AuthController",
+                "com.miui.systemui.biometrics.AuthBiometricFaceView",
+                "com.miui.systemui.biometrics.AuthBiometricView",
+                "com.samsung.android.biometrics.AuthBiometricFaceView",
+                "com.samsung.android.biometrics.AuthBiometricView"
             )
 
             for (className in targetClasses) {
@@ -1245,6 +1250,51 @@ class FaceHook : IXposedHookLoadPackage {
                                         if (settings.instantFaceConfirmation) {
                                             param.setResult(false)
                                         }
+                                    }
+                                }
+                            )
+                        }
+                    }
+
+                    for (method in clazz.declaredMethods) {
+                        if (method.name == "onAuthenticationSucceeded") {
+                            XposedBridge.hookMethod(
+                                method,
+                                object : XC_MethodHook() {
+                                    override fun beforeHookedMethod(param: MethodHookParam) {
+                                        val target = param.thisObject ?: return
+                                        setBooleanField(target, "mRequireConfirmation", false)
+                                        setBooleanField(target, "mConfirmationRequired", false)
+                                        setBooleanField(target, "mIsConfirmationRequired", false)
+                                        setBooleanField(target, "requireConfirmation", false)
+                                        setBooleanField(target, "confirmationRequired", false)
+                                    }
+
+                                    override fun afterHookedMethod(param: MethodHookParam) {
+                                        val target = param.thisObject ?: return
+                                        val settings = getHookSettings()
+                                        if (settings.instantFaceConfirmation) {
+                                            try {
+                                                XposedHelpers.callMethod(target, "onConfirmClicked")
+                                            } catch (_: Throwable) {
+                                                try {
+                                                    XposedHelpers.callMethod(target, "handleConfirmClicked")
+                                                } catch (_: Throwable) {
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            )
+                        } else if (method.name == "updateState") {
+                            XposedBridge.hookMethod(
+                                method,
+                                object : XC_MethodHook() {
+                                    override fun beforeHookedMethod(param: MethodHookParam) {
+                                        val target = param.thisObject ?: return
+                                        setBooleanField(target, "mRequireConfirmation", false)
+                                        setBooleanField(target, "mConfirmationRequired", false)
+                                        setBooleanField(target, "mIsConfirmationRequired", false)
                                     }
                                 }
                             )

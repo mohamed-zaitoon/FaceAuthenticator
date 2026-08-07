@@ -8,8 +8,8 @@ googleServices = "4.5.0"
 java = "21"
 minSdk = "29"
 targetSdk = "37"
-versionCode = "125"
-versionName = "v1.3-beta04"
+versionCode = "130"
+versionName = "v1.3"
 xposedApi = "82"
 
 [libraries]
