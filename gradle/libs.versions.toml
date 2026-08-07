@@ -1,5 +1,5 @@
 [versions]
-agp = "9.3.1"
+agp = "9.4.0-alpha08"
 androidxCore = "1.19.0"
 androidxSwipeRefreshLayout = "1.2.0"
 compileSdk = "37"
@@ -8,8 +8,8 @@ googleServices = "4.5.0"
 java = "21"
 minSdk = "29"
 targetSdk = "37"
-versionCode = "124"
-versionName = "v1.3-beta03"
+versionCode = "125"
+versionName = "v1.3-beta04"
 xposedApi = "82"
 
 [libraries]

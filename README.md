@@ -2,12 +2,12 @@
 
 ### Strong Face Unlock for BiometricPrompt Apps
 
-[![Version](https://img.shields.io/badge/Version-v1.3--beta03-2ea44f?style=for-the-badge&logo=github)](https://github.com/mohamed-zaitoon/FaceAuthenticator/releases)
+[![Version](https://img.shields.io/badge/Version-v1.3--beta04-2ea44f?style=for-the-badge&logo=github)](https://github.com/mohamed-zaitoon/FaceAuthenticator/releases)
 [![Android](https://img.shields.io/badge/Android-10%2B%20(API%2029%2B)-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://www.android.com/)
 [![Target](https://img.shields.io/badge/Target-Android%2017%20(API%2037)-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://www.android.com/)
 [![Xposed](https://img.shields.io/badge/Xposed-LSPosed%20Module-orange?style=for-the-badge)](https://github.com/LSPosed/LSPosed)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.4.0-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)](https://kotlinlang.org/)
-[![Gradle](https://img.shields.io/badge/Gradle-9.6.1-02303A?style=for-the-badge&logo=gradle&logoColor=white)](https://gradle.org/)
+[![Gradle](https://img.shields.io/badge/Gradle-9.7.0-02303A?style=for-the-badge&logo=gradle&logoColor=white)](https://gradle.org/)
 
 **FaceAuthenticator** is an Xposed/LSPosed module that upgrades the real Android face biometric sensor registration to `BIOMETRIC_STRONG`, respects apps that request one biometric type, and silently requests face after a configurable fingerprint window when apps request both fingerprint and face.
 

@@ -22,6 +22,13 @@ class FaceHook : IXposedHookLoadPackage {
             return
         }
 
+        if (lpparam.packageName == "com.android.systemui" || lpparam.processName == "com.android.systemui") {
+            if (isDisableFilePresent()) return
+            XposedBridge.log(TAG + "Loaded in SystemUI. Enabling instant face confirmation hooks.")
+            hookSystemUiFaceConfirmation(lpparam.classLoader)
+            return
+        }
+
         if (!isSystemFrameworkPackage(lpparam.packageName, lpparam.processName)) {
             return
         }
@@ -39,6 +46,9 @@ class FaceHook : IXposedHookLoadPackage {
         }
 
         XposedBridge.log(TAG + "System framework loaded. Enabling real face strong hooks.")
+
+        hookPromptInfoClass(lpparam.classLoader)
+        hookAuthSessionConfirmation(lpparam.classLoader)
 
         if (ENABLE_SYSTEM_CONFIG_AND_PROVIDER_UPGRADE) {
             hookBiometricConfig(lpparam.classLoader)
@@ -1138,6 +1148,134 @@ class FaceHook : IXposedHookLoadPackage {
             )
         }
 
+        private fun hookPromptInfoClass(classLoader: ClassLoader) {
+            try {
+                val promptInfoClass = XposedHelpers.findClass(
+                    "android.hardware.biometrics.PromptInfo",
+                    classLoader
+                )
+                val methodsToOverride = arrayOf(
+                    "isConfirmationRequired",
+                    "isConfirmationRequested",
+                    "requireConfirmation",
+                    "isRequireConfirmation"
+                )
+                for (methodName in methodsToOverride) {
+                    for (method in promptInfoClass.declaredMethods) {
+                        if (method.name == methodName && method.parameterTypes.isEmpty()) {
+                            XposedBridge.hookMethod(
+                                method,
+                                object : XC_MethodHook() {
+                                    override fun beforeHookedMethod(param: MethodHookParam) {
+                                        val settings = getHookSettings()
+                                        if (settings.instantFaceConfirmation) {
+                                            param.setResult(false)
+                                        }
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }
+                XposedBridge.log(TAG + "Hooked PromptInfo confirmation methods.")
+            } catch (t: Throwable) {
+                XposedBridge.log(TAG + "Error hooking PromptInfo class: " + t.message)
+            }
+        }
+
+        private fun hookAuthSessionConfirmation(classLoader: ClassLoader) {
+            val classNames = arrayOf(
+                "com.android.server.biometrics.AuthSession",
+                "com.android.server.biometrics.BiometricService\$AuthSession"
+            )
+            for (className in classNames) {
+                try {
+                    val clazz = XposedHelpers.findClass(className, classLoader)
+                    for (method in clazz.declaredMethods) {
+                        if ((method.name == "isConfirmationRequired" || method.name == "requireConfirmation") &&
+                            method.returnType == Boolean::class.javaPrimitiveType
+                        ) {
+                            XposedBridge.hookMethod(
+                                method,
+                                object : XC_MethodHook() {
+                                    override fun beforeHookedMethod(param: MethodHookParam) {
+                                        val settings = getHookSettings()
+                                        if (settings.instantFaceConfirmation) {
+                                            param.setResult(false)
+                                        }
+                                    }
+                                }
+                            )
+                        }
+                    }
+                    XposedBridge.log(TAG + "Hooked " + className + " confirmation methods.")
+                } catch (_: Throwable) {
+                }
+            }
+        }
+
+        private fun hookSystemUiFaceConfirmation(classLoader: ClassLoader) {
+            XposedBridge.log(TAG + "Loading SystemUI face confirmation bypass hooks.")
+
+            val targetClasses = arrayOf(
+                "com.android.systemui.biometrics.AuthBiometricFaceView",
+                "com.android.systemui.biometrics.AuthBiometricView",
+                "com.android.systemui.biometrics.AuthBiometricFingerprintAndFaceView",
+                "com.android.systemui.biometrics.AuthContainerView",
+                "com.android.systemui.biometrics.AuthController"
+            )
+
+            for (className in targetClasses) {
+                try {
+                    val clazz = XposedHelpers.findClass(className, classLoader)
+                    val methodNames = arrayOf(
+                        "requireConfirmation",
+                        "isConfirmationRequired",
+                        "needConfirmation",
+                        "getRequireConfirmation"
+                    )
+
+                    for (method in clazz.declaredMethods) {
+                        if (methodNames.contains(method.name) && method.returnType == Boolean::class.javaPrimitiveType) {
+                            XposedBridge.hookMethod(
+                                method,
+                                object : XC_MethodHook() {
+                                    override fun beforeHookedMethod(param: MethodHookParam) {
+                                        val settings = getHookSettings()
+                                        if (settings.instantFaceConfirmation) {
+                                            param.setResult(false)
+                                        }
+                                    }
+                                }
+                            )
+                        }
+                    }
+
+                    XposedBridge.hookAllConstructors(
+                        clazz,
+                        object : XC_MethodHook() {
+                            override fun afterHookedMethod(param: MethodHookParam) {
+                                val settings = getHookSettings()
+                                if (settings.instantFaceConfirmation) {
+                                    val target = param.thisObject ?: return
+                                    setBooleanField(target, "mRequireConfirmation", false)
+                                    setBooleanField(target, "mConfirmationRequired", false)
+                                    setBooleanField(target, "mIsConfirmationRequired", false)
+                                    setBooleanField(target, "requireConfirmation", false)
+                                    setBooleanField(target, "confirmationRequired", false)
+                                }
+                            }
+                        }
+                    )
+
+                    XposedBridge.log(TAG + "Hooked SystemUI class: " + className)
+                } catch (_: XposedHelpers.ClassNotFoundError) {
+                } catch (t: Throwable) {
+                    XposedBridge.log(TAG + "Error hooking SystemUI class " + className + ": " + t.message)
+                }
+            }
+        }
+
         private fun patchPromptInfoForInstantFaceConfirmation(args: Array<Any?>?) {
             if (args == null) {
                 return
@@ -1150,7 +1288,7 @@ class FaceHook : IXposedHookLoadPackage {
 
                 var changed = false
                 try {
-                    XposedHelpers.callMethod(arg, "setConfirmationRequested", false)
+                    XposedHelpers.callMethod(arg, "setIsConfirmationRequired", false)
                     changed = true
                 } catch (_: Throwable) {
                 }
@@ -1159,10 +1297,26 @@ class FaceHook : IXposedHookLoadPackage {
                     changed = true
                 } catch (_: Throwable) {
                 }
-                changed = setBooleanField(arg!!, "mConfirmationRequested", false) || changed
-                changed = setBooleanField(arg, "confirmationRequested", false) || changed
+                try {
+                    XposedHelpers.callMethod(arg, "setConfirmationRequested", false)
+                    changed = true
+                } catch (_: Throwable) {
+                }
+                try {
+                    XposedHelpers.callMethod(arg, "setRequireConfirmation", false)
+                    changed = true
+                } catch (_: Throwable) {
+                }
+
+                changed = setBooleanField(arg!!, "mIsConfirmationRequired", false) || changed
+                changed = setBooleanField(arg, "mRequireConfirmation", false) || changed
                 changed = setBooleanField(arg, "mConfirmationRequired", false) || changed
+                changed = setBooleanField(arg, "mConfirmationRequested", false) || changed
+                changed = setBooleanField(arg, "mIsConfirmationRequested", false) || changed
+                changed = setBooleanField(arg, "isConfirmationRequired", false) || changed
+                changed = setBooleanField(arg, "requireConfirmation", false) || changed
                 changed = setBooleanField(arg, "confirmationRequired", false) || changed
+                changed = setBooleanField(arg, "confirmationRequested", false) || changed
 
                 if (changed) {
                     XposedBridge.log(TAG + "Requested instant face confirmation for PromptInfo.")
@@ -1180,7 +1334,9 @@ class FaceHook : IXposedHookLoadPackage {
                 className.endsWith(".PromptInfo") ||
                 className.contains("PromptInfo") ||
                 hasField(value, "mConfirmationRequested") ||
-                hasField(value, "confirmationRequested")
+                hasField(value, "confirmationRequested") ||
+                hasField(value, "mIsConfirmationRequired") ||
+                hasField(value, "mRequireConfirmation")
         }
 
         private fun hasHardwareBackedCryptoOperation(

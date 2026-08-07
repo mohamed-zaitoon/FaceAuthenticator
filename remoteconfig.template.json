@@ -2,13 +2,13 @@
   "parameters": {
     "latest_version_name": {
       "defaultValue": {
-        "value": "v1.3-beta03"
+        "value": "v1.3-beta04"
       },
       "valueType": "STRING"
     },
     "latest_version_code": {
       "defaultValue": {
-        "value": "124"
+        "value": "125"
       },
       "valueType": "NUMBER"
     },
