@@ -6,19 +6,47 @@
     <title>Face Authenticator | Strong Face Unlock</title>
     <link rel="icon" type="image/png" href="logo.png">
     <style>
-        :root { --primary: #00e676; --bg: #121212; --surface: #1e1e1e; --text: #e0e0e0; }
+        :root {
+            color-scheme: light dark;
+            --primary: #00c853;
+            --bg: #f8f9fa;
+            --surface: #ffffff;
+            --text: #212529;
+            --hero-text: #555555;
+            --card-title: #111827;
+            --card-border: rgba(0, 0, 0, 0.08);
+            --footer-text: #6b7280;
+            --btn-text: #ffffff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #00e676;
+                --bg: #121212;
+                --surface: #1e1e1e;
+                --text: #e0e0e0;
+                --hero-text: #b0b0b0;
+                --card-title: #ffffff;
+                --card-border: transparent;
+                --footer-text: #666666;
+                --btn-text: #000000;
+                --shadow: none;
+            }
+        }
+
         * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; line-height: 1.6; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; line-height: 1.6; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; }
         .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; text-align: center; }
         .logo-container { display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
         .app-icon { width: 60px; height: 60px; margin-right: 15px; border-radius: 12px; }
         .logo-text { font-size: 3rem; line-height: 1.1; font-weight: bold; background: linear-gradient(45deg, #00e676, #2979ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; overflow-wrap: anywhere; }
         .badges img { margin: 5px; height: 25px; }
-        .hero-text { font-size: 1.2rem; color: #b0b0b0; margin-bottom: 30px; }
+        .hero-text { font-size: 1.2rem; color: var(--hero-text); margin-bottom: 30px; }
 
         .btn-download {
             display: inline-block; cursor: pointer;
-            background: var(--primary); color: #000;
+            background: var(--primary); color: var(--btn-text);
             padding: 15px 40px; font-size: 1.2rem; font-weight: bold;
             text-decoration: none; border-radius: 50px;
             transition: transform 0.2s, box-shadow 0.2s, background 0.2s; margin-bottom: 40px; border: none;
@@ -27,9 +55,9 @@
         .btn-download:disabled { background: #555; cursor: wait; transform: none; box-shadow: none; color: #aaa; }
 
         .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; text-align: left; margin-top: 40px; }
-        .feature-card { background: var(--surface); padding: 20px; border-radius: 12px; border-left: 4px solid var(--primary); }
-        .feature-title { font-weight: bold; color: #fff; margin-bottom: 10px; display: block; }
-        footer { margin-top: 60px; font-size: 0.9rem; color: #666; }
+        .feature-card { background: var(--surface); padding: 20px; border-radius: 12px; border-left: 4px solid var(--primary); box-shadow: var(--shadow); border-top: 1px solid var(--card-border); border-right: 1px solid var(--card-border); border-bottom: 1px solid var(--card-border); transition: background-color 0.3s ease; }
+        .feature-title { font-weight: bold; color: var(--card-title); margin-bottom: 10px; display: block; }
+        footer { margin-top: 60px; font-size: 0.9rem; color: var(--footer-text); }
         a { color: var(--primary); text-decoration: none; }
 
         @media (max-width: 520px) {
